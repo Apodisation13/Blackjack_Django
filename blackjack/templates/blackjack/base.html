@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ЗАГОЛОВОК</title>
+</head>
+<body>
+ЭТО РУКА ДИЛЕРА
+<p>
+    <img src={{ url1 }} alt="" width="150" height="170">
+    <img src={{ url2 }} alt="" width="150" height="170">
+</p>
+<h2>СЧЁТ дилера - {{ dealer_result }}</h2>
+
+ЭТО РУКА ИГРОКА
+<p>
+    <img src={{ url3 }} alt="" width="150" height="170">
+    <img src={{ url4 }} alt="" width="150" height="170">
+</p>
+
+<h2>ВАШ СЧЁТ - {{ player_result }}</h2>
+
+{#<form action="draw_another_card">#}
+{#   <p><input type="button" value="ещё карта" onclick=></p>#}
+{#  </form>#}
+<button name="button" type="submit" onclick="location.href='{% url "draw" %}'">DRAW</button>
+
+</body>
+</html>
