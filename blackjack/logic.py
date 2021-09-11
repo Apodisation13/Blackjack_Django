@@ -37,3 +37,10 @@ def starting_draw():
 
 def hit():
     ...
+
+
+def show_score(score: tuple):
+    if not score[1]:
+        return str(score[0])
+    else:
+        return str(f'{score[0]}/{score[1]}')

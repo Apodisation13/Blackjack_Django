@@ -55,11 +55,13 @@ def base_view(request):
     if max(player.score) == 21 or max(dealer.score) == 21:
         return redirect('end_of_round')
 
+    player_score_str = player.set_score_to_str()  # представление - или просто число, или строка число\число
+
     context = {
         'dealer_hand_urls': dealer.urls,
         'player_hand_urls': player.urls,
         'dealer_result': "???",
-        'player_result': player.score,
+        'player_result': player_score_str,
         'money': MONEY,
         'bet': BET,
         'deck': len(DECK)
@@ -79,11 +81,13 @@ def hit(request):
     if max(player.score) >= 21:
         return redirect('end_of_round')
 
+    player_score_str = player.set_score_to_str()  # представление - или просто число, или строка число\число
+
     context = {
         'dealer_hand_urls': dealer.urls,
         'player_hand_urls': player.urls,
         'dealer_result': "???",
-        'player_result': player.score,
+        'player_result': player_score_str,
         'money': MONEY,
         'bet': BET,
         'deck': len(DECK)
@@ -95,9 +99,10 @@ def end_of_round(request):
     """/game/end_of_round"""
     sleep(1)
     template_name = 'blackjack/end_of_round.html'
-    global player, MONEY, BET
+    global player, dealer, MONEY, BET
 
     player_score = max(player.score)  # не забываем что там кортеж
+    dealer_score = max(dealer.score)
 
     money_before = MONEY
 
@@ -105,9 +110,9 @@ def end_of_round(request):
         MONEY += BET * 3
 
     context = {
-        # 'url1': urls[0], 'url2': urls[1],
+        'dealer_hand_urls': dealer.urls,
         'player_hand_urls': player.urls,
-        # 'dealer_result': dealer_score,
+        'dealer_result': dealer_score,
         'player_result': player_score,
         'money_before': money_before,
         'money': MONEY,

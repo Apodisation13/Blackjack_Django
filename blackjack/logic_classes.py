@@ -22,14 +22,19 @@ class Participant:
         draw = choice(deck)
         deck.remove(draw)
         self.hand.append(draw)
-
         # self.hand.append("aceclub")  # тест на нужную карту
+
+    def set_score_to_str(self):
+        if not self.score[1]:
+            return str(self.score[0])
+        else:
+            return str(f'{self.score[0]}/{self.score[1]}')
 
 
 class Player(Participant):
     def __init__(self, deck):
         super().__init__(deck)
-        # self.hand = ["10club", "aceclub"]  # тестирование на фиксированную руку
+        # self.hand = ["2club", "aceclub"]  # тестирование на фиксированную руку
         # self.calc_score(self.hand)  # тестирование на фиксированную руку
 
         self.urls = []  # урлы для картинок
@@ -49,7 +54,7 @@ class Player(Participant):
 class Dealer(Participant):
     def __init__(self, deck):
         super().__init__(deck)
-        # self.hand = ["qdiamond", "7hearts"] # тестирование на фиксированную руку
+        # self.hand = ["qdiamond", "acehearts"] # тестирование на фиксированную руку
         # self.calc_score(self.hand) # тестирование на фиксированную руку
 
         # self.number = 0  # номер карты в руке дилера

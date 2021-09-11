@@ -5,8 +5,17 @@
     <title>Конец раунда</title>
 </head>
 <body>
-КОНЕЦ РАУНДА<br><br>
-ВАША РУКА<br>
+БАБЛО {{ money }}<br>
+СТАВКА {{ bet }}<br>
+{#колода {{ deck }}<br>#}
+
+ЭТО РУКА ДИЛЕРА<br>
+{% for card_url in dealer_hand_urls %}
+    <img src={{ card_url }} width="150" height="170">
+{% endfor %}
+<h2>СЧЁТ дилера - {{ dealer_result }}</h2>
+
+ЭТО РУКА ИГРОКА<br>
 {% for card_url in player_hand_urls %}
     <img src={{ card_url }} width="150" height="170">
 {% endfor %}
@@ -18,6 +27,15 @@
     </h1>
     <h2>
     У вас денег {{ money_before }} + {{ bet }} + {{ bet }} + {{ bet }} = {{ money }}
+    </h2>
+{% endif %}
+
+{% if dealer_result == 21 %}
+    <h1>
+    <font color="red">У ДИЛЕРА БЛЭКДЖЕК, ВЫ ПРОИГРАЛИ!</font>
+    </h1>
+    <h2>
+    У вас денег: {{ money_before }}
     </h2>
 {% endif %}
 
