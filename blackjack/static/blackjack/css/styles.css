@@ -1,0 +1,40 @@
+/*html, body {*/
+/*	margin: 0;*/
+/*	padding: 0;*/
+/*	height: 100%;*/
+/*	width: 100%;*/
+/*	color: #444;*/
+/*    background-image: url("https://i.ibb.co/sJ963Dc/Table.png");*/
+/*}*/
+
+.topcorner1{
+    position:absolute;
+    top:20px;
+    right:20px;
+}
+.topcorner2{
+    position:absolute;
+    top:50px;
+    right:20px;
+}
+.start_button{
+    color: red;
+    background: yellow;
+    width: 300px;
+    height: 100px;
+    font-size: 20pt;
+    border-radius: 10px;
+    border-color: yellow;
+    margin: 0 auto;
+    display: table;
+    text-align: center;
+}
+.custom_button{
+    color: black;
+    width: 150px;
+    height: 75px;
+    font-size: 14pt;
+    border-radius: 10px;
+    border-color: black;
+    background: linear-gradient(90deg,yellow,yellowgreen);
+}
