@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Конец раунда</title>
+</head>
+<body>
+КОНЕЦ РАУНДА<br><br>
+ВАША РУКА<br>
+{% for card_url in player_hand_urls %}
+    <img src={{ card_url }} width="150" height="170">
+{% endfor %}
+<h2>ВАШ СЧЁТ - {{ player_result }}</h2>
+
+{% if player_result == 21 %}
+    <h1>
+    <font color="green">У ВАС БЛЭКДЖЕК!!! ПОЗДРАВЛЯЮ!</font>
+    </h1>
+    <h2>
+    У вас денег {{ money_before }} + {{ bet }} + {{ bet }} + {{ bet }} = {{ money }}
+    </h2>
+{% endif %}
+
+{% if player_result > 21 %}
+    <h1>
+    <font color="red">BUSTED!!! Вы проиграли!</font>
+    </h1>
+    <h2>
+    У вас денег: {{ money_before }}
+    </h2>
+{% endif %}
+
+СЫГРАЙТЕ ЕЩЁ
+<button name="button" type="submit" onclick="location.href='{% url "input_bet" %}'">новый раунд</button>
+</body>
+</html>

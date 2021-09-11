@@ -1,29 +1,53 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ЗАГОЛОВОК</title>
+    <title>РАУНД</title>
+    <script type="text/javascript" src="{% static "blackjack/js/try.js" %}"></script>
 </head>
-<body>
-ЭТО РУКА ДИЛЕРА
-<p>
-    <img src={{ url1 }} alt="" width="150" height="170">
-    <img src={{ url2 }} alt="" width="150" height="170">
-</p>
-<h2>СЧЁТ дилера - {{ dealer_result }}</h2>
 
-ЭТО РУКА ИГРОКА
-<p>
-    <img src={{ url3 }} alt="" width="150" height="170">
-    <img src={{ url4 }} alt="" width="150" height="170">
-</p>
+<body>
+БАБЛО {{ money }}<br>
+СТАВКА {{ bet }}<br>
+колода {{ deck }}<br>
+{#ЭТО РУКА ДИЛЕРА<br>#}
+{##}
+{#    <img src={{ url1 }} width="150" height="170">#}
+{#    <img src={{ url2 }} width="150" height="170">#}
+{##}
+{#<h2>СЧЁТ дилера - {{ dealer_result }}</h2>#}
+
+ЭТО РУКА ИГРОКА<br>
+
+{#    <img src={{ player_card_1 }} width="150" height="170">#}
+{#    <img src={{ player_card_2 }} width="150" height="170">#}
+{##}
+{#    {% if player_card_3 %}#}
+{#        <img src={{ player_card_3 }} width="150" height="170">#}
+{#    {% endif %}#}
+
+    {% for card_url in player_hand_urls %}
+        <img src={{ card_url }} width="150" height="170">
+    {% endfor %}
+{#<p><input value="Нажми меня" onclick="sss1()" type="button"></p>#}
+{#<div id="button1"></div>#}
+{#<p><input value="Нажми меня" onclick="sss2()" type="button"></p>#}
+{#<div id="button2"></div>#}
 
 <h2>ВАШ СЧЁТ - {{ player_result }}</h2>
 
+{% if player_score >= 21 %}
+
+{% endif %}
 {#<form action="draw_another_card">#}
 {#   <p><input type="button" value="ещё карта" onclick=></p>#}
 {#  </form>#}
-<button name="button" type="submit" onclick="location.href='{% url "draw" %}'">DRAW</button>
+
+
+<button name="button" type="submit" onclick="location.href='{% url "hit" %}'">HIT</button>
+
+<button name="button" type="submit" onclick="location.href='{% url "input_bet" %}'">новый раунд</button>
 
 </body>
 </html>

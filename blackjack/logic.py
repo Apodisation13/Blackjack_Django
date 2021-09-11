@@ -5,6 +5,7 @@ from blackjack.deck import links, deck
 
 
 def starting_draw():
+    global DECK
     DECK = deck.copy()
 
     dealer_hand = []
@@ -28,6 +29,11 @@ def starting_draw():
 
     for card in player_hand:
         urls.append(links.get(card))
+
     player_score = calc_cards(player_hand)
 
     return dealer_score, player_score, urls
+
+
+def hit():
+    ...

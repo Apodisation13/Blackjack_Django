@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ввод ставки</title>
+</head>
+<body>
+<form action="{% url 'base_view' %}">
+    <h1>ВАШЕ БАБЛО {{ money }}</h1>
+    ВВЕДИТЕ СТАВКУ: <input type="text" name="bet"><br><br>
+    <input type="submit" name="play">
+    </form>
+</body>
+</html>
