@@ -1,6 +1,6 @@
 from time import sleep
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 
 from .deck import deck
@@ -35,7 +35,7 @@ def input_bet_view(request):
 
 def base_view(request):
     """/game"""
-    template_name = 'blackjack/base.html'
+    template_name = 'blackjack/start_game.html'
 
     # dealer_score, player_score, urls = starting_draw()
 
@@ -52,7 +52,10 @@ def base_view(request):
     BET = int(BET)
     MONEY -= BET
 
-    if max(player.score) == 21 or max(dealer.score) == 21:
+    if max(player.score) == 21:
+        return redirect('end_of_round')
+    if max(dealer.score) == 21:
+        dealer.get_url_for_hidden_card()
         return redirect('end_of_round')
 
     player_score_str = player.set_score_to_str()  # представление - или просто число, или строка число\число
@@ -71,7 +74,7 @@ def base_view(request):
 
 def hit(request):
     """/game/hit"""
-    template_name = 'blackjack/base.html'
+    template_name = 'blackjack/start_game.html'
 
     global DECK, player, dealer
     player.hit(DECK)
@@ -97,7 +100,6 @@ def hit(request):
 
 def end_of_round(request):
     """/game/end_of_round"""
-    sleep(1)
     template_name = 'blackjack/end_of_round.html'
     global player, dealer, MONEY, BET
 
@@ -108,6 +110,10 @@ def end_of_round(request):
 
     if player_score == 21:
         MONEY += BET * 3
+    if dealer_score > 21:
+        MONEY += BET * 2
+    if dealer_score == player_score:
+        MONEY += BET
 
     context = {
         'dealer_hand_urls': dealer.urls,
@@ -121,3 +127,38 @@ def end_of_round(request):
     }
 
     return render(request, template_name, context)
+
+
+def stand(request):
+    """game/stand/"""
+    template_name = 'blackjack/start_game.html'
+    global player, dealer, DECK, MONEY, BET
+
+    dealer.get_url_for_hidden_card()
+
+    dealer.ai_logic(player, DECK)
+    dealer.get_urls(dealer.hand[2:])
+
+    player_score_str = player.set_score_to_str()  # представление - или просто число, или строка число\число
+    dealer_score_str = dealer.set_score_to_str()  # представление - или просто число, или строка число\число
+
+    if max(dealer.score) > 21 or max(dealer.score) >= max(player.score):
+        return redirect('end_of_round')
+
+    context = {
+        'dealer_hand_urls': dealer.urls,
+        'player_hand_urls': player.urls,
+        'dealer_result': dealer_score_str,
+        'player_result': player_score_str,
+        'money': MONEY,
+        'bet': BET,
+        'deck': len(DECK)
+    }
+
+    return render(request, template_name, context)
+
+
+def zero_money(request):
+    sleep(4)
+    template_name = 'blackjack/zero_money.html'
+    return render(request, template_name, {})

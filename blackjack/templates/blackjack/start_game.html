@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>РАУНД</title>
+    <link type="text/css" href="{% static 'blackjack/css/styles.css' %}" rel="stylesheet" />
+    <script type="text/javascript" src="{% static "blackjack/js/try.js" %}"></script>
+</head>
+
+
+<body>
+
+<div class="topcorner1">БАБЛО {{ money }}</div>
+<div class="topcorner2">СТАВКА {{ bet }}</div>
+{#колода {{ deck }}<br>#}
+
+ЭТО РУКА ДИЛЕРА<br>
+
+{% for card_url in dealer_hand_urls %}
+    <img src={{ card_url }} width="150" height="170">
+{% endfor %}
+<h2>СЧЁТ дилера - {{ dealer_result }}</h2>
+
+ЭТО РУКА ИГРОКА<br>
+
+{% for card_url in player_hand_urls %}
+    <img src={{ card_url }} width="150" height="170">
+{% endfor %}
+
+{#<p><input value="Нажми меня" onclick="sss1()" type="button"></p>#}
+{#<div id="button1"></div>#}
+{#<p><input value="Нажми меня" onclick="sss2()" type="button"></p>#}
+{#<div id="button2"></div>#}
+
+<h2>ВАШ СЧЁТ - {{ player_result }}</h2>
+
+{% if player_score >= 21 %}
+
+{% endif %}
+
+
+<button class="custom_button" name="button" type="submit"
+        onclick="location.href='{% url "hit" %}'">HIT</button>
+<button class="custom_button" name="button" type="submit"
+        onclick="location.href='{% url "stand" %}'">STAND</button><br>
+
+</body>
+</html>

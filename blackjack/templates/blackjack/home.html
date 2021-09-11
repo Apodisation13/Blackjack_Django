@@ -1,12 +1,14 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>HELLO</title>
+    <link type="text/css" href="{% static 'blackjack/css/styles.css' %}" rel="stylesheet" />
 </head>
 <body>
 
-<button onclick="location.href='/input_money'">НАЧАТЬ ИГРУ</button>
+<button class="start_button" onclick="location.href='/input_money'">НАЧАТЬ ИГРУ</button>
 
 </body>
 </html>

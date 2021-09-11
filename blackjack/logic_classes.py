@@ -14,6 +14,8 @@ class Participant:
         self.score = ()  # счёт в руке вида кортеж (без_туза, с_тузом)
         self.calc_score(self.hand)  # выполнить расчёт очков
 
+        self.urls = []  # урлы для картинок
+
     def calc_score(self, hand):
         self.score = calc_cards(hand)
 
@@ -24,11 +26,17 @@ class Participant:
         self.hand.append(draw)
         # self.hand.append("aceclub")  # тест на нужную карту
 
+        self.calc_score(self.hand)
+
     def set_score_to_str(self):
         if not self.score[1]:
             return str(self.score[0])
         else:
             return str(f'{self.score[0]}/{self.score[1]}')
+
+    def get_urls(self, hand: list):
+        for card in hand:
+            self.urls.append(links.get(card))
 
 
 class Player(Participant):
@@ -37,12 +45,7 @@ class Player(Participant):
         # self.hand = ["2club", "aceclub"]  # тестирование на фиксированную руку
         # self.calc_score(self.hand)  # тестирование на фиксированную руку
 
-        self.urls = []  # урлы для картинок
         self.get_urls(self.hand)
-
-    def get_urls(self, hand):
-        for card in hand:
-            self.urls.append(links.get(card))
 
     def hit(self, deck):
         super().hit(deck)
@@ -57,13 +60,20 @@ class Dealer(Participant):
         # self.hand = ["qdiamond", "acehearts"] # тестирование на фиксированную руку
         # self.calc_score(self.hand) # тестирование на фиксированную руку
 
-        # self.number = 0  # номер карты в руке дилера
-        # self.open_card(self.number)  # выполняем метод открыть карту
-        # self.hidden_card()  # выполняем метод скрытой карты
+        self.get_starting_urls()
 
-        self.urls = []  # урлы для картинок
-        self.get_urls(self.hand)
-
-    def get_urls(self, hand):
-        self.urls.append(links.get(hand[0]))
+    def get_starting_urls(self):
+        self.urls.append(links.get(self.hand[0]))
         self.urls.append(links['cardback'])
+
+    def get_url_for_hidden_card(self):
+        self.urls[1] = links[self.hand[1]]
+
+    def ai_logic(self, player, deck):
+        if max(player.score) <= 11 and max(player.score) == max(self.score):
+            self.hit(deck)
+        # костыль - если у игрока 11 или меньше, то при равенстве очков дилеру не страшно рискнуть и взять карту
+        # потому что при любой карте 21 он не переберёт
+
+        while max(self.score) < max(player.score):  # если очков одинаково, дилер не рискует
+            self.hit(deck)

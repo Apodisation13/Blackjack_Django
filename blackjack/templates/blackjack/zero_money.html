@@ -1,0 +1,17 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>БАНКРОТ!:(</title>
+    <link type="text/css" href="{% static 'blackjack/css/styles.css' %}" rel="stylesheet" />
+</head>
+<body>
+<h1>ВЫ ПРОИГРАЛИ ВСЕ ДЕНЬГИ...</h1><br>
+<h2>ХОТИТЕ ПОПРОБОВАТЬ СНОВА?</h2><br>
+<button class="custom_button" name="button" type="submit"
+        onclick="location.href='{% url "input_money" %}'">ДА КОНЕЧНО</button>
+<button class="custom_button" name="button" type="submit"
+        onclick="location.href='{% url "home" %}'">нет, хватит</button><br>
+</body>
+</html>
