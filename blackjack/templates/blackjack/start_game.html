@@ -1,4 +1,5 @@
 {% load static %}
+{% load blackjack_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,15 +12,13 @@
 
 <body>
 
-<div class="topcorner1">БАБЛО {{ money }}</div>
-<div class="topcorner2">СТАВКА {{ bet }}</div>
-{#колода {{ deck }}<br>#}
+{% show_money_and_bet money=money bet=bet %}
 
 ЭТО РУКА ДИЛЕРА<br>
-
 {% for card_url in dealer_hand_urls %}
     <img src={{ card_url }} width="150" height="170">
 {% endfor %}
+
 <h2>СЧЁТ дилера - {{ dealer_result }}</h2>
 
 ЭТО РУКА ИГРОКА<br>
@@ -40,9 +39,9 @@
 {% endif %}
 
 
-<button class="custom_button" name="button" type="submit"
+<button class="hit_button" name="button" type="submit"
         onclick="location.href='{% url "hit" %}'">HIT</button>
-<button class="custom_button" name="button" type="submit"
+<button class="stand_button" name="button" type="submit"
         onclick="location.href='{% url "stand" %}'">STAND</button><br>
 
 </body>

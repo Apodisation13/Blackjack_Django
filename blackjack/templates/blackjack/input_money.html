@@ -1,15 +1,20 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+{% extends "blackjack/base.html" %}
+
+{% block title %}
     <title>Ввод суммы</title>
-    <link type="text/css" href="{% static 'blackjack/css/styles.css' %}" rel="stylesheet" />
-</head>
-<body>
-<form action="{% url 'input_bet' %}">
-    Введи сколько взять денег: <input type="text" name="money"><br><br>
-    <input type="submit" name="play">
+{% endblock %}
+
+
+{% block body %}
+
+<div class="centered_container">
+    <form action="{% url 'input_bet' %}">
+
+    Введи сколько взять денег:<br><br>
+
+    <input type="text" name="money"><br><br>
+    <input type="submit" name="play" value="ПЕРЕЙТИ К ИГРЕ">
+
     </form>
-</body>
-</html>
+</div>
+{% endblock %}

@@ -9,7 +9,6 @@
 <body>
 <div class="topcorner1">БАБЛО {{ money }}</div>
 <div class="topcorner2">СТАВКА {{ bet }}</div>
-{#колода {{ deck }}<br>#}
 
 ЭТО РУКА ДИЛЕРА<br>
 {% for card_url in dealer_hand_urls %}
@@ -78,12 +77,15 @@
 {% endif %}
 
 {% if money != 0 %}
-СЫГРАЙТЕ ЕЩЁ
-<button name="button" type="submit"
+    <div class="another_round">
+СЫГРАЙТЕ ЕЩЁ<br>
+        <button name="button" type="submit" class="stand_button"
         onclick="location.href='{% url "input_bet" %}'">новый раунд</button>
+    </div>
 {% else %}
     <meta http-equiv="REFRESH" content="0;url=zero_money">
 {% endif %}
+
 
 {#{% if money == 0 %}#}
 {#    {% include 'blackjack/zero_money.html' %}#}

@@ -1,14 +1,12 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>HELLO</title>
-    <link type="text/css" href="{% static 'blackjack/css/styles.css' %}" rel="stylesheet" />
-</head>
-<body>
+{% extends "blackjack/base.html" %}
 
-<button class="start_button" onclick="location.href='/input_money'">НАЧАТЬ ИГРУ</button>
+{% block title %}
+    <title>ДОБРО ПОЖАЛОВАТЬ</title>
+{% endblock %}
 
-</body>
-</html>
+{% block body %}
+<div class="centered_container">
+    <button class="custom_button" onclick="location.href='/input_money'">НАЧАТЬ ИГРУ</button>
+</div>
+
+{% endblock %}

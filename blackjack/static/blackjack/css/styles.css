@@ -8,16 +8,27 @@
 /*}*/
 
 .topcorner1{
+    /*показать виджет денег*/
     position:absolute;
     top:20px;
     right:20px;
 }
 .topcorner2{
+    /*показать виджет ставки*/
     position:absolute;
     top:50px;
     right:20px;
+    /*bottom: 20pt;*/
 }
-.start_button{
+.another_round{
+    /*кнопка следующего раунда*/
+    position:absolute;
+    top:170px;
+    right:20px;
+}
+
+.centered_container{
+    /*контейнер начать игру, ввести деньги, ввести ставку */
     color: red;
     background: yellow;
     width: 300px;
@@ -25,16 +36,46 @@
     font-size: 20pt;
     border-radius: 10px;
     border-color: yellow;
-    margin: 0 auto;
-    display: table;
+    /*margin: 0 auto;*/
+    display: inline-block;
     text-align: center;
+    vertical-align: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
 }
 .custom_button{
+    /*кнопка начать игру, ввести деньги, ввести ставку*/
     color: black;
     width: 150px;
     height: 75px;
     font-size: 14pt;
     border-radius: 10px;
     border-color: black;
-    background: linear-gradient(90deg,yellow,yellowgreen);
+    background: linear-gradient(90deg,mediumspringgreen,green);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.hit_button{
+    color: black;
+    width: 150px;
+    height: 75px;
+    font-size: 14pt;
+    border-radius: 10px;
+    border-color: black;
+    background: linear-gradient(90deg,yellow,orange);
+}
+.stand_button{
+    color: black;
+    width: 150px;
+    height: 75px;
+    font-size: 14pt;
+    border-radius: 10px;
+    border-color: black;
+    background: linear-gradient(90deg,forestgreen,limegreen);
 }

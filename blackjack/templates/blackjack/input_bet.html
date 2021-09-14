@@ -1,14 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Ввод ставки</title>
-</head>
-<body>
-<form action="{% url 'base_view' %}">
-    <h1>ВАШЕ БАБЛО {{ money }}</h1>
-    ВВЕДИТЕ СТАВКУ: <input type="text" name="bet"><br><br>
-    <input type="submit" name="play">
+{% extends "blackjack/base.html" %}
+{% load blackjack_tags %}
+
+{% block title %}
+     <title>Ввод ставки</title>
+{% endblock %}
+
+{% block body %}
+{% show_money_and_bet money %}
+
+<div class="centered_container">
+
+    <form action="{% url 'base_view' %}">
+        ВВЕДИТЕ СТАВКУ: <input type="text" name="bet"><br><br>
+    <input type="submit" name="play" value="Раздать карты">
+
     </form>
-</body>
-</html>
+
+</div>
+
+{% endblock %}
