@@ -1,48 +1,29 @@
-{% load static %}
+{% extends "blackjack/base.html" %}
 {% load blackjack_tags %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>РАУНД</title>
-    <link type="text/css" href="{% static 'blackjack/css/styles.css' %}" rel="stylesheet" />
-    <script type="text/javascript" src="{% static "blackjack/js/try.js" %}"></script>
-</head>
 
+{% block title %}
+    <title>Раунд</title>
+{% endblock %}
 
-<body>
+{% block body %}
 
 {% show_money_and_bet money=money bet=bet %}
 
 ЭТО РУКА ДИЛЕРА<br>
 {% for card_url in dealer_hand_urls %}
-    <img src={{ card_url }} width="150" height="170">
+    <img src={{ card_url }} width="150" height="170" alt="">
 {% endfor %}
-
 <h2>СЧЁТ дилера - {{ dealer_result }}</h2>
 
 ЭТО РУКА ИГРОКА<br>
-
 {% for card_url in player_hand_urls %}
-    <img src={{ card_url }} width="150" height="170">
+    <img src={{ card_url }} width="150" height="170" alt="">
 {% endfor %}
-
-{#<p><input value="Нажми меня" onclick="sss1()" type="button"></p>#}
-{#<div id="button1"></div>#}
-{#<p><input value="Нажми меня" onclick="sss2()" type="button"></p>#}
-{#<div id="button2"></div>#}
-
 <h2>ВАШ СЧЁТ - {{ player_result }}</h2>
-
-{% if player_score >= 21 %}
-
-{% endif %}
-
 
 <button class="hit_button" name="button" type="submit"
         onclick="location.href='{% url "hit" %}'">HIT</button>
 <button class="stand_button" name="button" type="submit"
         onclick="location.href='{% url "stand" %}'">STAND</button><br>
 
-</body>
-</html>
+{% endblock %}

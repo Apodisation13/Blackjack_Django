@@ -60,6 +60,8 @@ links = {
     "acehearts": "https://i.ibb.co/1JKf1dj/acehearts.jpg",
     "acespade": "https://i.ibb.co/Wf13nqD/acespade.jpg",
     "cardback": "https://i.ibb.co/ZdmDvxQ/cardback.jpg",
+    "cardback2": "https://i.ibb.co/DGPb1Qq/cardback2.jpg",
+    "cardback3": "https://i.ibb.co/GtWYHrL/cardbackred.png",
     "play_button": "https://i.ibb.co/jwtLDQ8/play-button.png",
     "table": "https://i.ibb.co/sJ963Dc/Table.png"
 }

@@ -42,7 +42,7 @@ class Participant:
 class Player(Participant):
     def __init__(self, deck):
         super().__init__(deck)
-        # self.hand = ["2club", "aceclub"]  # тестирование на фиксированную руку
+        # self.hand = ["5club", "9club"]  # тестирование на фиксированную руку
         # self.calc_score(self.hand)  # тестирование на фиксированную руку
 
         self.get_urls(self.hand)
@@ -57,14 +57,14 @@ class Player(Participant):
 class Dealer(Participant):
     def __init__(self, deck):
         super().__init__(deck)
-        # self.hand = ["qdiamond", "acehearts"] # тестирование на фиксированную руку
+        # self.hand = ["4diamond", "10hearts"] # тестирование на фиксированную руку
         # self.calc_score(self.hand) # тестирование на фиксированную руку
 
         self.get_starting_urls()
 
     def get_starting_urls(self):
-        self.urls.append(links.get(self.hand[0]))
-        self.urls.append(links['cardback'])
+        self.urls.append(links.get(self.hand[0]))  # первая карта из руки
+        self.urls.append(links['cardback3'])  # вторая карта - жёстко обложка
 
     def get_url_for_hidden_card(self):
         self.urls[1] = links[self.hand[1]]
