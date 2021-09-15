@@ -8,13 +8,16 @@
 {% block body %}
 
 <div class="centered_container">
-    <form action="{% url 'input_bet' %}">
-
-    Введи сколько взять денег:<br><br>
-
-    <input type="text" name="money"><br><br>
-    <input type="submit" name="play" value="ПЕРЕЙТИ К ИГРЕ">
-
-    </form>
+{#    <form action="{% url 'input_bet' %}">#}
+{##}
+{#    Введи сколько взять денег:<br><br>#}
+{#    <input type="text" name="money"><br><br>#}
+{#    <input type="submit" name="play" value="ПЕРЕЙТИ К ИГРЕ">#}
+{##}
+{#    </form>#}
+<form action="{% url 'input_bet' %}" method="POST">{% csrf_token %}
+    {{form.as_p}}
+    <button type="submit">ПЕРЕЙТИ К СТАВКЕ</button>
+</form>
 </div>
 {% endblock %}

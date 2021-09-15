@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-yjwg%u&jv6ow2z27ddt27za)ui67mjyx=a=w&d@eydm1x7uz)#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -50,6 +50,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # по закрытию браузера
 
 ROOT_URLCONF = 'blackjack_django.urls'
 

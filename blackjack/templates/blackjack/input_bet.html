@@ -1,20 +1,19 @@
 {% extends "blackjack/base.html" %}
-{% load blackjack_tags %}
 
 {% block title %}
      <title>Ввод ставки</title>
 {% endblock %}
 
 {% block body %}
-{% show_money_and_bet money %}
+
+<div class="topcorner1">БАБЛО {{ money }}</div>
 
 <div class="centered_container">
 
-    <form action="{% url 'base_view' %}">
-        ВВЕДИТЕ СТАВКУ: <input type="text" name="bet"><br><br>
-    <input type="submit" name="play" value="Раздать карты">
-
-    </form>
+   <form action="{% url 'base_view' %}" method="POST">{% csrf_token %}
+    {{form.as_p}}
+    <button type="submit">РАЗДАТЬ КАРТЫ</button>
+</form>
 
 </div>
 

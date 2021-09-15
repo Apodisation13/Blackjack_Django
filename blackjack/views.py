@@ -1,36 +1,50 @@
 from time import sleep
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseNotFound
 from django.shortcuts import render, redirect
 
 from .deck import deck
 from .logic_classes import Player, Dealer
+from .forms import MoneyForm, BetForm
+
+
+# first_time = True
+MONEY = 0
+BET = 0
 
 
 def home(request):
     """/"""
     template_name = 'blackjack/home.html'
+    # global first_time
+    # first_time = True
     return render(request, template_name, {})
 
 
 def input_money_view(request):
     """/input_money"""
     template_name = 'blackjack/input_money.html'
-    global first_time  # первый вход для ввода бабла
-    first_time = True
-    return render(request, template_name, {})
+    form = MoneyForm
+    context = {'form': form}
+    return render(request, template_name, context)
 
 
 def input_bet_view(request):
     """/input_money/input-bet"""
     template_name = 'blackjack/input_bet.html'
-    global MONEY, first_time
-    if first_time:  # особенности джанго - только при первом входе смотреть чё там
-        MONEY = request.GET.get('money')
-        if not MONEY.isdigit():
-            return HttpResponse('ТАК НЕЛЬЗЯ')
-        MONEY = int(MONEY)
-    return render(request, template_name, {'money': MONEY})
+    global MONEY
+    # global first_time
+    if request.method == 'POST':
+        form = MoneyForm(request.POST)
+        if form.is_valid():
+            MONEY = form.cleaned_data.get('money')
+            print('денег', MONEY)
+
+    form = BetForm
+    # if first_time:  # особенности джанго - только при первом входе смотреть чё там
+    #     MONEY = request.GET.get('money')
+    context = {'money': MONEY, 'form': form}
+    return render(request, template_name, context)
 
 
 def base_view(request):
@@ -44,12 +58,21 @@ def base_view(request):
     player = Player(DECK)
     dealer = Dealer(DECK)
 
-    global MONEY, BET, first_time
-    first_time = False  # первый вход в смысле ввода бабла
-    BET = request.GET.get('bet')
-    if not BET.isdigit():
-        return HttpResponse('ТАК НЕЛЬЗЯ')
-    BET = int(BET)
+    global MONEY, BET
+    # global first_time
+    # first_time = False  # первый вход в смысле ввода бабла
+    # BET = request.GET.get('bet')
+    # if not BET.isdigit():
+    #     return HttpResponse('ТАК НЕЛЬЗЯ')
+    # BET = int(BET)
+
+    if request.method == 'POST':
+        form = BetForm(request.POST)
+        if form.clean_bet(MONEY):
+            BET = int(form.data.get('bet'))
+            print('ставка', BET)
+            print('денег', MONEY)
+
     MONEY -= BET
 
     if max(player.score) == 21:
@@ -162,3 +185,8 @@ def zero_money(request):
     sleep(4)
     template_name = 'blackjack/zero_money.html'
     return render(request, template_name, {})
+
+
+def page_not_found(request, exception):
+    msg = '<h1><font color="red">СТАВКА БОЛЬШЕ ЧЕМ У ВАС ДЕНЕГ</font></h1>'
+    return HttpResponseNotFound(msg)
