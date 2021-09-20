@@ -79,3 +79,12 @@
     border-color: black;
     background: linear-gradient(90deg,forestgreen,limegreen);
 }
+.double_down_button {
+    color: black;
+    width: 150px;
+    height: 75px;
+    font-size: 14pt;
+    border-radius: 10px;
+    border-color: black;
+    background: linear-gradient(90deg, blue, blueviolet);
+}

@@ -1,14 +1,13 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+{% extends "blackjack/base.html" %}
+{% load blackjack_tags %}
+
+{% block title %}
     <title>Конец раунда</title>
-    <link type="text/css" href="{% static 'blackjack/css/styles.css' %}" rel="stylesheet" />
-</head>
-<body>
-<div class="topcorner1">БАБЛО {{ money }}</div>
-<div class="topcorner2">СТАВКА {{ bet }}</div>
+{% endblock %}
+
+{% block body %}
+
+{% show_money_and_bet money=money bet=bet %}
 
 ЭТО РУКА ДИЛЕРА<br>
 {% for card_url in dealer_hand_urls %}
@@ -22,58 +21,62 @@
 {% endfor %}
 <h2>ВАШ СЧЁТ - {{ player_result }}</h2>
 
-{% if player_result == 21 %}
+{% if player_result == 21 and player_hand == 2 or player_result == 21 and dealer_result != 21 %}
+{# выиграл игрок по блэкджеку сразу или блэкджек потом, но у дилера не 21 #}
     <h1>
     <font color="green">У ВАС БЛЭКДЖЕК!!! ПОЗДРАВЛЯЮ!</font>
     </h1>
     <h2>
     У вас денег {{ money_before }} + {{ bet }} + {{ bet }} + {{ bet }} = {{ money }}
     </h2>
-{% endif %}
 
-{% if dealer_result == 21 %}
+{% elif dealer_result == 21 and player_result != 21 %}
+{#    выиграл дилер по блэкджеку, а у игрока не 21 #}
     <h1>
     <font color="red">У ДИЛЕРА БЛЭКДЖЕК, ВЫ ПРОИГРАЛИ!</font>
     </h1>
     <h2>
     У вас денег: {{ money_before }}
     </h2>
-{% endif %}
 
-{% if player_result > 21 %}
+{% elif dealer_result == player_result %}
+    {% if dealer_result == 21 and player_result == 21 %}
+    <h1>
+    <font color="#a9a9a9">Ничего себе... У обоих блэкджек! НИЧЬЯ...</font>
+    </h1>
+    {% else %}
+    <h1>
+    <font color="#808080">Ничья... Так бывает</font>
+    </h1>
+    {% endif %}
+    <h2>
+    У вас денег: {{ money_before }} + {{ bet }} = {{ money }}
+    </h2>
+
+{% elif player_result > 21 %}
     <h1>
     <font color="red">BUSTED!!! Вы проиграли!</font>
     </h1>
     <h2>
     У вас денег: {{ money_before }}
     </h2>
-{% endif %}
 
-{% if dealer_result > 21 %}
+{% elif dealer_result > 21 %}
     <h1>
     <font color="green">DEALER BUSTED!!! Вы выиграли!</font>
     </h1>
     <h2>
     У вас денег: {{ money_before }} + {{ bet }} + {{ bet }} = {{ money }}
     </h2>
-{% endif %}
 
-{% if dealer_result == player_result %}
-    <h1>
-    <font color="#808080">Ничья... Так бывает</font>
-    </h1>
-    <h2>
-    У вас денег: {{ money_before }} + {{ bet }} = {{ money }}
-    </h2>
-{% endif %}
-
-{% if dealer_result > player_result and dealer_result < 21 %}
+{% elif dealer_result > player_result and dealer_result < 21 %}
     <h1>
     <font color="red">Вы проиграли, у дилера очков больше, чем у вас</font>
     </h1>
     <h2>
     У вас денег: {{ money_before }}
     </h2>
+
 {% endif %}
 
 {% if money != 0 %}
@@ -91,5 +94,4 @@
 {#    {% include 'blackjack/zero_money.html' %}#}
 {#{% endif %}#}
 
-</body>
-</html>
+{% endblock %}

@@ -3,15 +3,14 @@ from time import sleep
 from django.http import HttpResponseNotFound
 from django.shortcuts import render, redirect
 
-# from .deck import deck
-# from .logic_classes import Player, Dealer
 from .forms import MoneyForm, get_money, BetForm
-from .logic import starting_draw_logic, payment_result
+from .logic import starting_draw_logic, hit_logic, \
+    redirect_from_start_via_blackjack, end_of_round_logic, stand_logic
 
 
 beginning = True  # нужен флаг для того, чтобы попадать в ввод денег только 1 раз
-MONEY = 0
-BET = 0
+MONEY, BET = 0, 0
+double_down_pressed = False
 DECK, player, dealer = None, None, None
 
 
@@ -33,32 +32,39 @@ def input_money_view(request):
 def input_bet_view(request):
     """/input_money/input-bet"""
     template_name = 'blackjack/input_bet.html'
-
     global MONEY
     if beginning:
-        MONEY = get_money(request)
-
+        MONEY = get_money(request)  # только при первом входе, записываем из формы в переменную
+        request.session['money'] = MONEY
     context = {'money': MONEY, 'form': BetForm}
     return render(request, template_name, context)
 
 
 def base_view(request):
-    """/game"""
+    """
+    /game
+    основное вью раунда
+    """
     template_name = 'blackjack/start_game.html'
 
-    global beginning
-    beginning = False
+    global beginning, double_down_pressed
+    beginning = False  # это для того, чтобы не анализировать форму с вводом денег далее
+    double_down_pressed = False
 
     global DECK, player, dealer, MONEY, BET
-    DECK, player, dealer, BET, MONEY, player_score_str = starting_draw_logic(request, MONEY)
+    DECK, player, dealer, BET, MONEY, player_score_str, double_down_chance = starting_draw_logic(request, MONEY)
+
+    if redirect_from_start_via_blackjack(player, dealer):  # проверка на 21
+        return redirect('end_of_round')
 
     context = {
-        'dealer_hand_urls': dealer.urls,
-        'player_hand_urls': player.urls,
-        'dealer_result': "???",
-        'player_result': player_score_str,
+        'dealer_hand_urls': dealer.urls,  # линки на карты дилера
+        'player_hand_urls': player.urls,  # линки на карты игрока
+        'dealer_result': "???",  # здесь специально ???, ибо счёт дилера игрок пока не знает
+        'player_result': player_score_str,  # счёт в виде 9/20 если в руке туз, и просто 20 если нету
         'money': MONEY,
         'bet': BET,
+        'double_down_chance': double_down_chance  # boolean данные о возможности удвоить ставку
         # 'deck': len(DECK)
     }
     return render(request, template_name, context)
@@ -69,14 +75,12 @@ def hit(request):
     template_name = 'blackjack/start_game.html'
 
     global DECK, player, dealer
-    player.hit(DECK)  # взять одну карту
+    DECK, player, dealer, player_score_str = hit_logic(DECK, player, dealer)
 
-    player.get_urls([player.hand[-1], ])  # сформировать линк на последнюю карту
-
-    if max(player.score) >= 21:  # если больше 21, сразу перейти на конец раунда
+    if max(player.score) > 21:  # если больше 21, сразу перейти на конец раунда
         return redirect('end_of_round')
-
-    player_score_str = player.set_score_to_str()  # представление - или просто число, или строка число\число
+    elif max(player.score) == 21:  # если у игрока ровно 21, идти на логику stand, где ходы дилера
+        return redirect('stand')
 
     context = {
         'dealer_hand_urls': dealer.urls,
@@ -84,6 +88,7 @@ def hit(request):
         'dealer_result': "???",
         'player_result': player_score_str,
         'money': MONEY,
+        # 'money': request.session['money'],
         'bet': BET,
         # 'deck': len(DECK)
     }
@@ -92,25 +97,23 @@ def hit(request):
 
 def end_of_round(request):
     """/game/end_of_round"""
+    sleep(0.5)
     template_name = 'blackjack/end_of_round.html'
 
-    global player, dealer, MONEY, BET, DECK
-
-    player_score = max(player.score)  # не забываем что там кортеж
-    dealer_score = max(dealer.score)
-
-    money_before = MONEY  # ведь мы уже вычли ставку, это для удобства отображения
-    MONEY = payment_result(player_score, dealer_score, MONEY, BET)
+    global DECK, player, dealer, MONEY, BET, double_down_pressed
+    player, dealer, MONEY, BET, money_before, dealer_score = \
+        end_of_round_logic(DECK, player, dealer, BET, MONEY, double_down_pressed)
 
     context = {
         'dealer_hand_urls': dealer.urls,
         'player_hand_urls': player.urls,
-        'dealer_result': dealer_score,
-        'player_result': player_score,
+        'dealer_result': dealer_score,  # если у игрока сразу 21, то дилер не покажет счёт
+        'player_result': max(player.score),
         'money_before': money_before,
         'money': MONEY,
         'bet': BET,
-        # 'deck': len(DECK)
+        'player_hand': len(player.hand),
+        'dealer_hand': len(dealer.hand)
     }
 
     return render(request, template_name, context)
@@ -119,17 +122,13 @@ def end_of_round(request):
 def stand(request):
     """game/stand/"""
     template_name = 'blackjack/start_game.html'
-    global player, dealer, DECK, MONEY, BET
 
-    dealer.get_url_for_hidden_card()  # получить линк на настоящую скрытую карту, 2ю в руке
+    global DECK, player, dealer, MONEY, BET
 
-    dealer.ai_logic(player, DECK)  # выполнить логику дилера: добор если меньше чем у игрока, или <=11
-    dealer.get_urls(dealer.hand[2:])  # найти линки на все карты после 2й
+    DECK, player, dealer, player_score_str, dealer_score_str = stand_logic(DECK, player, dealer)
 
-    player_score_str = player.set_score_to_str()  # представление - или просто число, или строка число\число
-    dealer_score_str = dealer.set_score_to_str()  # представление - или просто число, или строка число\число
-
-    if max(dealer.score) > 21 or max(dealer.score) >= max(player.score):
+    # TODO: почему не >=
+    if max(dealer.score) > 21 or max(player.score) >= 21 or max(dealer.score) >= max(player.score):
         return redirect('end_of_round')  # если дилер вылетел, или у них ничья, то пойти на конец раунда
 
     context = {
@@ -143,6 +142,13 @@ def stand(request):
     }
 
     return render(request, template_name, context)
+
+
+def double_down(request):
+    """промежуточная вью для того, чтобы отследить нажатие кнопки double-down"""
+    global double_down_pressed
+    double_down_pressed = True
+    return redirect('end_of_round')
 
 
 def zero_money(request):

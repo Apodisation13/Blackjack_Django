@@ -4,6 +4,7 @@ from django.http import Http404
 
 
 class MoneyForm(forms.Form):
+    """форма для ввода денег"""
     money = forms.IntegerField(min_value=1)  # TODO: кастомное сообщение об ошибки, не работает
 
     class Meta:
@@ -19,24 +20,27 @@ class MoneyForm(forms.Form):
 
 
 def get_money(request):
+    """во вью достать из формы деньги и присвоить их в переменную MONEY"""
     if request.method == 'POST':
         form = MoneyForm(request.POST)
         if form.is_valid():
-            MONEY = form.cleaned_data.get('money')
-            print('денег', MONEY)
+            MONEY = form.cleaned_data.get('money')  # здесь идёт запись в переменную MONEY
+            # print('денег', MONEY)
             return MONEY
 
 
 class BetForm(forms.Form):
+    """форма для ввода ставки"""
     bet = forms.IntegerField(min_value=1)
 
     class Meta:
         fields = ['bet', ]
 
     def clean_bet(self, money):
+        """проверка что ставка больше 0 и не больше чем всего денег"""
         bet = int(self.data.get('bet'))
-        print(money)
-        print(bet)
+        # print(money)
+        # print(bet)
         if bet > money or bet <= 0:
             # raise ValidationError('Ставка не должна быть больше чем у вас денег')  # TODO: убрать ошибку??
             raise Http404()
@@ -44,10 +48,11 @@ class BetForm(forms.Form):
 
 
 def get_bet(request, money):
+    """для вью - достать ставку из формы, записать в переменную BET"""
     if request.method == 'POST':
         form = BetForm(request.POST)
         if form.clean_bet(money):
             BET = int(form.data.get('bet'))
-            print('ставка', BET)
-            print('денег', money)
+            # print('ставка', BET)
+            # print('денег', money)
             return BET

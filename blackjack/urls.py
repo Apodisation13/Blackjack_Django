@@ -12,4 +12,5 @@ urlpatterns = [
     path('game/end_of_round/', end_of_round, name='end_of_round'),
     path('game/stand/', stand, name='stand'),
     path('game/end_of_round/zero_money/', zero_money, name='zero_money'),
+    path('game/double_down/', double_down, name='double_down'),
 ]
