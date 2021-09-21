@@ -9,7 +9,6 @@ from .logic import starting_draw_logic, hit_logic, \
 
 
 beginning = True  # нужен флаг для того, чтобы попадать в ввод денег только 1 раз
-MONEY, BET = 0, 0
 double_down_pressed = False
 DECK, player, dealer = None, None, None
 
@@ -32,11 +31,10 @@ def input_money_view(request):
 def input_bet_view(request):
     """/input_money/input-bet"""
     template_name = 'blackjack/input_bet.html'
-    global MONEY
+    global beginning
     if beginning:
-        MONEY = get_money(request)  # только при первом входе, записываем из формы в переменную
-        request.session['money'] = MONEY
-    context = {'money': MONEY, 'form': BetForm}
+        get_money(request)  # только при первом входе, записываем из формы в переменную
+    context = {'money': request.session['money'], 'form': BetForm}
     return render(request, template_name, context)
 
 
@@ -45,14 +43,17 @@ def base_view(request):
     /game
     основное вью раунда
     """
+    print(request.session['money'])
     template_name = 'blackjack/start_game.html'
 
     global beginning, double_down_pressed
     beginning = False  # это для того, чтобы не анализировать форму с вводом денег далее
     double_down_pressed = False
 
-    global DECK, player, dealer, MONEY, BET
-    DECK, player, dealer, BET, MONEY, player_score_str, double_down_chance = starting_draw_logic(request, MONEY)
+    global DECK, player, dealer
+    DECK, player, dealer, player_score_str, double_down_chance = starting_draw_logic(request)
+
+    print(request.session['money'], request.session['bet'])
 
     if redirect_from_start_via_blackjack(player, dealer):  # проверка на 21
         return redirect('end_of_round')
@@ -62,8 +63,8 @@ def base_view(request):
         'player_hand_urls': player.urls,  # линки на карты игрока
         'dealer_result': "???",  # здесь специально ???, ибо счёт дилера игрок пока не знает
         'player_result': player_score_str,  # счёт в виде 9/20 если в руке туз, и просто 20 если нету
-        'money': MONEY,
-        'bet': BET,
+        'money': request.session['money'],
+        'bet': request.session['bet'],
         'double_down_chance': double_down_chance  # boolean данные о возможности удвоить ставку
         # 'deck': len(DECK)
     }
@@ -87,9 +88,8 @@ def hit(request):
         'player_hand_urls': player.urls,
         'dealer_result': "???",
         'player_result': player_score_str,
-        'money': MONEY,
-        # 'money': request.session['money'],
-        'bet': BET,
+        'money': request.session['money'],
+        'bet': request.session['bet'],
         # 'deck': len(DECK)
     }
     return render(request, template_name, context)
@@ -100,9 +100,9 @@ def end_of_round(request):
     sleep(0.5)
     template_name = 'blackjack/end_of_round.html'
 
-    global DECK, player, dealer, MONEY, BET, double_down_pressed
-    player, dealer, MONEY, BET, money_before, dealer_score = \
-        end_of_round_logic(DECK, player, dealer, BET, MONEY, double_down_pressed)
+    global DECK, player, dealer, double_down_pressed
+    player, dealer, money_before, dealer_score = \
+        end_of_round_logic(request, DECK, player, dealer, double_down_pressed)
 
     context = {
         'dealer_hand_urls': dealer.urls,
@@ -110,8 +110,8 @@ def end_of_round(request):
         'dealer_result': dealer_score,  # если у игрока сразу 21, то дилер не покажет счёт
         'player_result': max(player.score),
         'money_before': money_before,
-        'money': MONEY,
-        'bet': BET,
+        'money': request.session['money'],
+        'bet': request.session['bet'],
         'player_hand': len(player.hand),
         'dealer_hand': len(dealer.hand)
     }
@@ -123,8 +123,7 @@ def stand(request):
     """game/stand/"""
     template_name = 'blackjack/start_game.html'
 
-    global DECK, player, dealer, MONEY, BET
-
+    global DECK, player, dealer
     DECK, player, dealer, player_score_str, dealer_score_str = stand_logic(DECK, player, dealer)
 
     # TODO: почему не >=
@@ -136,8 +135,8 @@ def stand(request):
         'player_hand_urls': player.urls,
         'dealer_result': dealer_score_str,
         'player_result': player_score_str,
-        'money': MONEY,
-        'bet': BET,
+        'money': request.session['money'],
+        'bet': request.session['bet'],
         # 'deck': len(DECK)
     }
 

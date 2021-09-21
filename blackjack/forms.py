@@ -24,9 +24,11 @@ def get_money(request):
     if request.method == 'POST':
         form = MoneyForm(request.POST)
         if form.is_valid():
-            MONEY = form.cleaned_data.get('money')  # здесь идёт запись в переменную MONEY
+            # MONEY = form.cleaned_data.get('money')  # здесь идёт запись в переменную MONEY
             # print('денег', MONEY)
-            return MONEY
+            request.session['money'] = form.cleaned_data.get('money')
+            # MONEY = request.session['money']
+            # return MONEY
 
 
 class BetForm(forms.Form):
@@ -47,12 +49,14 @@ class BetForm(forms.Form):
         return bet
 
 
-def get_bet(request, money):
+def get_bet(request):
     """для вью - достать ставку из формы, записать в переменную BET"""
     if request.method == 'POST':
         form = BetForm(request.POST)
-        if form.clean_bet(money):
-            BET = int(form.data.get('bet'))
+        if form.clean_bet(request.session['money']):
+            # BET = int(form.data.get('bet'))
             # print('ставка', BET)
             # print('денег', money)
-            return BET
+            request.session['bet'] = int(form.data.get('bet'))
+            # BET = request.session['bet']
+            # return BET
