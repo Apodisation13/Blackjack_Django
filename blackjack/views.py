@@ -8,9 +8,7 @@ from .logic import starting_draw_logic, hit_logic, \
     redirect_from_start_via_blackjack, end_of_round_logic, stand_logic
 
 
-beginning = True  # нужен флаг для того, чтобы попадать в ввод денег только 1 раз
-double_down_pressed = False
-DECK, player, dealer = None, None, None
+player, dealer = None, None
 
 
 def home(request):
@@ -22,8 +20,7 @@ def home(request):
 def input_money_view(request):
     """/input_money"""
     template_name = 'blackjack/input_money.html'
-    global beginning
-    beginning = True
+    request.session['beginning'] = True  # флаг для первого входа, чтобы дальше не запрашивать форму MoneyForm
     context = {'form': MoneyForm}
     return render(request, template_name, context)
 
@@ -31,8 +28,7 @@ def input_money_view(request):
 def input_bet_view(request):
     """/input_money/input-bet"""
     template_name = 'blackjack/input_bet.html'
-    global beginning
-    if beginning:
+    if request.session['beginning']:
         get_money(request)  # только при первом входе, записываем из формы в переменную
     context = {'money': request.session['money'], 'form': BetForm}
     return render(request, template_name, context)
@@ -46,12 +42,12 @@ def base_view(request):
     print(request.session['money'])
     template_name = 'blackjack/start_game.html'
 
-    global beginning, double_down_pressed
-    beginning = False  # это для того, чтобы не анализировать форму с вводом денег далее
-    double_down_pressed = False
+    # это для того, чтобы не анализировать форму с вводом денег далее, когда мы вернёмся на input_bet
+    request.session['beginning'] = False
+    request.session['double_down_pressed'] = False  # статус нажатия кнопки double-down
 
-    global DECK, player, dealer
-    DECK, player, dealer, player_score_str, double_down_chance = starting_draw_logic(request)
+    global player, dealer
+    player, dealer, player_score_str, double_down_chance = starting_draw_logic(request)
 
     print(request.session['money'], request.session['bet'])
 
@@ -75,8 +71,8 @@ def hit(request):
     """/game/hit"""
     template_name = 'blackjack/start_game.html'
 
-    global DECK, player, dealer
-    DECK, player, dealer, player_score_str = hit_logic(DECK, player, dealer)
+    global player, dealer
+    player, dealer, player_score_str = hit_logic(request, player, dealer)
 
     if max(player.score) > 21:  # если больше 21, сразу перейти на конец раунда
         return redirect('end_of_round')
@@ -100,9 +96,9 @@ def end_of_round(request):
     sleep(0.5)
     template_name = 'blackjack/end_of_round.html'
 
-    global DECK, player, dealer, double_down_pressed
-    player, dealer, money_before, dealer_score = \
-        end_of_round_logic(request, DECK, player, dealer, double_down_pressed)
+    global player, dealer
+    player, dealer, money_before, dealer_score = end_of_round_logic(request, player, dealer)
+    # print(len(request.session['deck']))
 
     context = {
         'dealer_hand_urls': dealer.urls,
@@ -123,8 +119,8 @@ def stand(request):
     """game/stand/"""
     template_name = 'blackjack/start_game.html'
 
-    global DECK, player, dealer
-    DECK, player, dealer, player_score_str, dealer_score_str = stand_logic(DECK, player, dealer)
+    global player, dealer
+    player, dealer, player_score_str, dealer_score_str = stand_logic(request, player, dealer)
 
     # TODO: почему не >=
     if max(dealer.score) > 21 or max(player.score) >= 21 or max(dealer.score) >= max(player.score):
@@ -145,8 +141,7 @@ def stand(request):
 
 def double_down(request):
     """промежуточная вью для того, чтобы отследить нажатие кнопки double-down"""
-    global double_down_pressed
-    double_down_pressed = True
+    request.session['double_down_pressed'] = True
     return redirect('end_of_round')
 
 

@@ -86,5 +86,6 @@
     font-size: 14pt;
     border-radius: 10px;
     border-color: black;
-    background: linear-gradient(90deg, blue, blueviolet);
+    background: linear-gradient(90deg,blue,blueviolet);
+    white-space: break-spaces;
 }

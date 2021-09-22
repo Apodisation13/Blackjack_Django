@@ -19,21 +19,23 @@ def starting_draw_logic(request):
     выполняет стартовую логику: создаёт игрока и дилера, достаёт из формы ставку, вычитает ставку из денег,
     перенапправляет на конец раунда если у кого-то сразу 21, представляет счёт в стр вида 11\21
     """
-    DECK = deck.copy()
-    player = Player(DECK)  # стартовая рука игрока (2 карты), линки, счёт
-    dealer = Dealer(DECK)  # стартовая рука дилера (2 карты), линк на 1ю карту и обложку, счёт не отображаем
+    request.session['deck'] = deck.copy()
+
+    # стартовая рука игрока (2 карты), линки, счёт
+    player = Player(request.session['deck'])
+    # стартовая рука дилера (2 карты), линк на 1ю карту и обложку, счёт не отображаем но считаем
+    dealer = Dealer(request.session['deck'])
 
     get_bet(request)  # достаём ставку из формы, записываем её в сессию
-
     request.session['money'] -= request.session['bet']  # после раздачи карт сразу вычесть из денег ставку
 
-    double_down_chance = False  # возможность поставить удвоенную ставку TODO: ТУТ НЕПРАВИЛЬНО
+    double_down_chance = False  # возможность поставить удвоенную ставку, если денег >= ставка
     if request.session['money'] >= request.session['bet']:  # если денег осталось больше чем ставка, то можно удвоить
         double_down_chance = True
 
     player_score_str = player.set_score_to_str()  # представление - или просто число, или строка число\число
 
-    return DECK, player, dealer, player_score_str, double_down_chance
+    return player, dealer, player_score_str, double_down_chance
 
 
 def redirect_from_start_via_blackjack(player, dealer):
@@ -45,24 +47,24 @@ def redirect_from_start_via_blackjack(player, dealer):
         return 21
 
 
-def hit_logic(DECK, player, dealer):
+def hit_logic(request, player, dealer):
     """взять карту, получить на неё линк, представление очков в виде 11/21"""
-    player.hit(DECK)  # взять одну карту и пересчитать очки
-
+    d = player.hit(request.session['deck'])
+    request.session['deck'] = d  # взять одну карту и пересчитать очки
     player.get_urls([player.hand[-1], ])  # сформировать линк на последнюю карту
 
     player_score_str = player.set_score_to_str()  # представление - или просто число, или строка 11/21
 
-    return DECK, player, dealer, player_score_str
+    return player, dealer, player_score_str
 
 
-def end_of_round_logic(request, DECK, player, dealer, double_down_pressed):
+def end_of_round_logic(request, player, dealer):
     """вычисляем тут сколько добавить пользователю денег"""
 
-    if double_down_pressed:
-        hit_logic(DECK, player, dealer)
+    if request.session['double_down_pressed']:
+        hit_logic(request.session['deck'], player, dealer)
         if max(player.score) <= 21:
-            stand_logic(DECK, player, dealer)
+            stand_logic(request.session['deck'], player, dealer)
         request.session['money'] -= request.session['bet']  # ещё вычли деньги ставки
         request.session['bet'] *= 2
 
@@ -77,7 +79,7 @@ def end_of_round_logic(request, DECK, player, dealer, double_down_pressed):
     return player, dealer, money_before, dealer_score
 
 
-def stand_logic(DECK, player, dealer):
+def stand_logic(request, player, dealer):
     """
     логика если игрок остановился:
     1) получить линк на скрытую карту дилера
@@ -88,10 +90,11 @@ def stand_logic(DECK, player, dealer):
 
     dealer.get_url_for_hidden_card()  # получить линк на настоящую скрытую карту, 2ю в руке
 
-    dealer.ai_logic(player, DECK)  # выполнить логику дилера: добор если меньше чем у игрока, или <=11
+    # выполнить логику дилера: добор если меньше чем у игрока, или <=11
+    dealer.ai_logic(player, request.session['deck'])
     dealer.get_urls(dealer.hand[2:])  # найти линки на все карты после 2й
 
     player_score_str = player.set_score_to_str()  # представление - или просто число, или строка число\число
     dealer_score_str = dealer.set_score_to_str()  # представление - или просто число, или строка число\число
 
-    return DECK, player, dealer, player_score_str, dealer_score_str
+    return player, dealer, player_score_str, dealer_score_str

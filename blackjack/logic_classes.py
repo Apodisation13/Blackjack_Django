@@ -24,6 +24,7 @@ class Participant:
         """кто-то берет 1 карту, пересчитать очки в руке"""
         draw = choice(deck)
         deck.remove(draw)
+        print(len(deck), 'из класса')
         self.hand.append(draw)
         # self.hand.append("aceclub")  # тест на нужную карту
 
@@ -54,6 +55,7 @@ class Player(Participant):
         super().hit(deck)
         # self.hand.append("6spade")  # тестирование требуемой карты, закомментить строку выше!
         # self.calc_score(self.hand)  # тестирование требуемой карты
+        return deck
 
 
 class Dealer(Participant):
