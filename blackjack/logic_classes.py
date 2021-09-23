@@ -16,9 +16,7 @@ class Participant:
             draw = choice(deck)
             deck.remove(draw)  # обязательно удалить карту из колоды, ведь мы её уже вытянули
             self.hand.append(draw)
-
         self.calc_score(self.hand)  # выполнить расчёт очков
-        print(self.hand, 'ИЗ КЛАССА', self.score)
 
     def calc_score(self, hand):
         """посчитать количество очков по картам в руке"""
@@ -28,10 +26,8 @@ class Participant:
         """кто-то берет 1 карту, пересчитать очки в руке"""
         draw = choice(deck)
         deck.remove(draw)
-        print(len(deck), 'из класса')
         self.hand.append(draw)
-        # self.hand.append("aceclub")  # тест на нужную карту
-
+        # self.hand.append("aceclub")  # тест на нужную карту, закомментировать 3 строки выше!
         self.calc_score(self.hand)  # пересчитать очки в руке
 
     def set_score_to_str(self):
@@ -72,7 +68,6 @@ class Player(Participant):
         super().start_draw(deck)
         # self.hand = ["kclub", "aceclub"]  # тестирование на фиксированную руку
         # self.calc_score(self.hand)  # тестирование на фиксированную руку
-
         self.get_urls(self.hand)
 
     def hit(self, deck):
@@ -87,13 +82,12 @@ class Dealer(Participant):
         super().start_draw(deck)
         # self.hand = ["acediamond", "10hearts"]  # тестирование на фиксированную руку
         # self.calc_score(self.hand)  # тестирование на фиксированную руку
-
         self.get_starting_urls()
 
     def get_starting_urls(self):
         """первую карту из руки - берем линк, а вторую - жёстко карту обложки"""
         self.urls.append(links.get(self.hand[0]))  # первая карта из руки
-        self.urls.append(links['cardback3'])  # вторая карта - жёстко обложка
+        self.urls.append(links['cardback1'])  # вторая карта - жёстко обложка
 
     def get_url_for_hidden_card(self):
         """для случая stand - получить линк на ту карту, где раньше была обложка"""
@@ -105,15 +99,12 @@ class Dealer(Participant):
         1) если у игрока меньше 11, а счёт игрока и дилера равный, то дилер возьмёт одну карту, т.к. не переберёт
         пример: 4,6==10, 3,7==10, дилеру смело можно брать 1 карту
         2) далее пока максимальный счёт дилера (с учётом туза) не больше максимального счёта игрока, брать дилеру карты
-        НЕ БУДЕТ ВЫЗЫВАТЬСЯ ЕСЛИ У ИГРОКА ПЕРЕБОР
+        ЭТОТ МЕТОД НЕ БУДЕТ ВЫЗЫВАТЬСЯ ЕСЛИ У ИГРОКА ПЕРЕБОР!
         """
         if max(player.score) <= 11 and max(player.score) == max(self.score):
             deck = self.hit(deck)
-
         while max(self.score) < max(player.score):  # если очков одинаково, дилер не рискует
             deck = self.hit(deck)
-            print('hit dealer')
-            print(self.score)
         return deck
 
     def hit(self, deck):

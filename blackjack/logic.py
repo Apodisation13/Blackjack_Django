@@ -10,7 +10,7 @@ def payment_result(request, player_score, dealer_score, player_hand_len):
         request.session['money'] += request.session['bet'] * 3
     elif dealer_score == player_score:  # если ничья, то все при своих, ставка вернулась
         request.session['money'] += request.session['bet']
-    elif dealer_score > 21:  # у дилера > 21, игрок выиграл две ставки
+    elif dealer_score > 21:  # у дилера > 21, игрок выиграл две ставки, свою и выигрыш такой же
         request.session['money'] += request.session['bet'] * 2
 
 
@@ -41,16 +41,15 @@ def starting_draw_logic(request):
 
     player_score_str = player.set_score_to_str()  # представление - или просто число, или строка число\число
     request.session['player_score_str'] = player_score_str
-    print('дошли до конца функции старт-дро')
 
 
 def redirect_from_start_via_blackjack(request, player, dealer):
     """редирект из стартовой руки на конец раунда если у кого-то 21"""
     if max(player.score) == 21:  # если у игрока сразу блэкджек - переходим на конец раунда
-        return 21  # КОСТЫЛЬ - тут можно ретёрн хоть что угодно
+        return 21  # КОСТЫЛЬ - тут можно ретёрн хоть что угодно)))
     if max(dealer.score) == 21:  # если у дилера сразу блэкджек, открываем его скрытую карту и на конец раунда
         dealer.get_url_for_hidden_card()
-        request.session['dealer'] = dealer.to_json()
+        request.session['dealer'] = dealer.to_json()  # урлы на картинки изменились, надо "обновить" объект
         return 21
 
 
@@ -104,6 +103,7 @@ def stand_logic(request):
     """
     player = Player.from_json(request.session['player'])
     dealer = Dealer.from_json(request.session['dealer'])
+
     dealer.get_url_for_hidden_card()  # получить линк на настоящую скрытую карту, 2ю в руке
 
     # выполнить логику дилера: добор если меньше чем у игрока, или <=11

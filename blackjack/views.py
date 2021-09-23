@@ -78,11 +78,11 @@ def end_of_round(request):
     end_of_round_logic(request)
     player = Player.from_json(request.session['player'])
     dealer = Dealer.from_json(request.session['dealer'])
-    print(request.session['dealer_result'])
-    print(dealer.score)
+
     context = get_context(
         request, player, dealer, max(player.score),
-        request.session['dealer_result'], request.session['money_before'])
+        request.session['dealer_result'], request.session['money_before']
+    )
 
     return render(request, template_name, context)
 
