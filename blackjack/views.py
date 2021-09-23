@@ -4,11 +4,10 @@ from django.http import HttpResponseNotFound
 from django.shortcuts import render, redirect
 
 from .forms import MoneyForm, get_money, BetForm
-from .logic import starting_draw_logic, hit_logic, \
-    redirect_from_start_via_blackjack, end_of_round_logic, stand_logic
-
-
-player, dealer = None, None
+from .logic import starting_draw_logic, hit_logic, end_of_round_logic, stand_logic
+from .logic import redirect_from_start_via_blackjack
+from .logic_classes import Player, Dealer
+from .utils import get_context
 
 
 def home(request):
@@ -21,8 +20,7 @@ def input_money_view(request):
     """/input_money"""
     template_name = 'blackjack/input_money.html'
     request.session['beginning'] = True  # флаг для первого входа, чтобы дальше не запрашивать форму MoneyForm
-    context = {'form': MoneyForm}
-    return render(request, template_name, context)
+    return render(request, template_name, {'form': MoneyForm})
 
 
 def input_bet_view(request):
@@ -30,40 +28,26 @@ def input_bet_view(request):
     template_name = 'blackjack/input_bet.html'
     if request.session['beginning']:
         get_money(request)  # только при первом входе, записываем из формы в переменную
-    context = {'money': request.session['money'], 'form': BetForm}
-    return render(request, template_name, context)
+    return render(request, template_name, {'money': request.session['money'], 'form': BetForm})
 
 
 def base_view(request):
-    """
-    /game
-    основное вью раунда
-    """
-    print(request.session['money'])
+    """ /game основное вью раунда """
     template_name = 'blackjack/start_game.html'
 
     # это для того, чтобы не анализировать форму с вводом денег далее, когда мы вернёмся на input_bet
     request.session['beginning'] = False
     request.session['double_down_pressed'] = False  # статус нажатия кнопки double-down
 
-    global player, dealer
-    player, dealer, player_score_str, double_down_chance = starting_draw_logic(request)
+    starting_draw_logic(request)
+    player = Player.from_json(request.session['player'])
+    dealer = Dealer.from_json(request.session['dealer'])
 
-    print(request.session['money'], request.session['bet'])
-
-    if redirect_from_start_via_blackjack(player, dealer):  # проверка на 21
+    if redirect_from_start_via_blackjack(request, player, dealer):  # проверка на 21
         return redirect('end_of_round')
 
-    context = {
-        'dealer_hand_urls': dealer.urls,  # линки на карты дилера
-        'player_hand_urls': player.urls,  # линки на карты игрока
-        'dealer_result': "???",  # здесь специально ???, ибо счёт дилера игрок пока не знает
-        'player_result': player_score_str,  # счёт в виде 9/20 если в руке туз, и просто 20 если нету
-        'money': request.session['money'],
-        'bet': request.session['bet'],
-        'double_down_chance': double_down_chance  # boolean данные о возможности удвоить ставку
-        # 'deck': len(DECK)
-    }
+    context = get_context(request, player, dealer, request.session['player_score_str'])
+
     return render(request, template_name, context)
 
 
@@ -71,23 +55,18 @@ def hit(request):
     """/game/hit"""
     template_name = 'blackjack/start_game.html'
 
-    global player, dealer
-    player, dealer, player_score_str = hit_logic(request, player, dealer)
+    hit_logic(request)
+
+    player = Player.from_json(request.session['player'])
+    dealer = Dealer.from_json(request.session['dealer'])
 
     if max(player.score) > 21:  # если больше 21, сразу перейти на конец раунда
         return redirect('end_of_round')
     elif max(player.score) == 21:  # если у игрока ровно 21, идти на логику stand, где ходы дилера
         return redirect('stand')
 
-    context = {
-        'dealer_hand_urls': dealer.urls,
-        'player_hand_urls': player.urls,
-        'dealer_result': "???",
-        'player_result': player_score_str,
-        'money': request.session['money'],
-        'bet': request.session['bet'],
-        # 'deck': len(DECK)
-    }
+    context = get_context(request, player, dealer, request.session['player_score_str'])
+
     return render(request, template_name, context)
 
 
@@ -96,21 +75,14 @@ def end_of_round(request):
     sleep(0.5)
     template_name = 'blackjack/end_of_round.html'
 
-    global player, dealer
-    player, dealer, money_before, dealer_score = end_of_round_logic(request, player, dealer)
-    # print(len(request.session['deck']))
-
-    context = {
-        'dealer_hand_urls': dealer.urls,
-        'player_hand_urls': player.urls,
-        'dealer_result': dealer_score,  # если у игрока сразу 21, то дилер не покажет счёт
-        'player_result': max(player.score),
-        'money_before': money_before,
-        'money': request.session['money'],
-        'bet': request.session['bet'],
-        'player_hand': len(player.hand),
-        'dealer_hand': len(dealer.hand)
-    }
+    end_of_round_logic(request)
+    player = Player.from_json(request.session['player'])
+    dealer = Dealer.from_json(request.session['dealer'])
+    print(request.session['dealer_result'])
+    print(dealer.score)
+    context = get_context(
+        request, player, dealer, max(player.score),
+        request.session['dealer_result'], request.session['money_before'])
 
     return render(request, template_name, context)
 
@@ -119,22 +91,15 @@ def stand(request):
     """game/stand/"""
     template_name = 'blackjack/start_game.html'
 
-    global player, dealer
-    player, dealer, player_score_str, dealer_score_str = stand_logic(request, player, dealer)
+    stand_logic(request)
+    player = Player.from_json(request.session['player'])
+    dealer = Dealer.from_json(request.session['dealer'])
 
     # TODO: почему не >=
     if max(dealer.score) > 21 or max(player.score) >= 21 or max(dealer.score) >= max(player.score):
         return redirect('end_of_round')  # если дилер вылетел, или у них ничья, то пойти на конец раунда
 
-    context = {
-        'dealer_hand_urls': dealer.urls,
-        'player_hand_urls': player.urls,
-        'dealer_result': dealer_score_str,
-        'player_result': player_score_str,
-        'money': request.session['money'],
-        'bet': request.session['bet'],
-        # 'deck': len(DECK)
-    }
+    context = get_context(request, player, dealer, request.session['player_score_str'])
 
     return render(request, template_name, context)
 

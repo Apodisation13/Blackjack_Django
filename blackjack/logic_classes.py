@@ -1,3 +1,4 @@
+import json
 from random import choice
 
 from .deck import links
@@ -5,16 +6,19 @@ from .calculate_hand import calc_cards
 
 
 class Participant:
-    def __init__(self, deck):
+    def __init__(self):
         self.hand = []  # рука участника
+        self.score = ()  # счёт в руке вида кортеж (туз считать за 1, туз считать за 11)
+        self.urls = []  # урлы для картинок
+
+    def start_draw(self, deck):
         for _ in range(2):  # тянем две случайные карты
             draw = choice(deck)
             deck.remove(draw)  # обязательно удалить карту из колоды, ведь мы её уже вытянули
             self.hand.append(draw)
-        self.score = ()  # счёт в руке вида кортеж (туз считать за 1, туз считать за 11)
-        self.calc_score(self.hand)  # выполнить расчёт очков
 
-        self.urls = []  # урлы для картинок
+        self.calc_score(self.hand)  # выполнить расчёт очков
+        print(self.hand, 'ИЗ КЛАССА', self.score)
 
     def calc_score(self, hand):
         """посчитать количество очков по картам в руке"""
@@ -42,11 +46,31 @@ class Participant:
         for card in hand:
             self.urls.append(links.get(card))
 
+    def to_json(self):
+        """джанго не умеет хранить в сессии объекты класса, а только джейсоны, вот представление в виде джейсона"""
+        participant = {
+            'hand': self.hand,
+            'score': self.score,
+            'urls': self.urls
+        }
+        # participant = self.__dict__  # альтернативный способ, но этот дикт может не быть заполнен ещё
+        return json.dumps(participant)
+
+    @classmethod
+    def from_json(cls, json_data):
+        """а это соответственно наоборот - создать объект этого класса на основании джейсона"""
+        data = json.loads(json_data)
+        obj = cls()
+        obj.hand = data['hand']
+        obj.score = data['score']
+        obj.urls = data['urls']
+        return obj
+
 
 class Player(Participant):
-    def __init__(self, deck):
-        super().__init__(deck)
-        # self.hand = ["kclub", "5club"]  # тестирование на фиксированную руку
+    def start_draw(self, deck):
+        super().start_draw(deck)
+        # self.hand = ["kclub", "aceclub"]  # тестирование на фиксированную руку
         # self.calc_score(self.hand)  # тестирование на фиксированную руку
 
         self.get_urls(self.hand)
@@ -59,9 +83,9 @@ class Player(Participant):
 
 
 class Dealer(Participant):
-    def __init__(self, deck):
-        super().__init__(deck)
-        # self.hand = ["acediamond", "5hearts"]  # тестирование на фиксированную руку
+    def start_draw(self, deck):
+        super().start_draw(deck)
+        # self.hand = ["acediamond", "10hearts"]  # тестирование на фиксированную руку
         # self.calc_score(self.hand)  # тестирование на фиксированную руку
 
         self.get_starting_urls()
@@ -84,13 +108,17 @@ class Dealer(Participant):
         НЕ БУДЕТ ВЫЗЫВАТЬСЯ ЕСЛИ У ИГРОКА ПЕРЕБОР
         """
         if max(player.score) <= 11 and max(player.score) == max(self.score):
-            self.hit(deck)
+            deck = self.hit(deck)
 
         while max(self.score) < max(player.score):  # если очков одинаково, дилер не рискует
-            self.hit(deck)
+            deck = self.hit(deck)
+            print('hit dealer')
+            print(self.score)
+        return deck
 
     def hit(self, deck):
         """это здесь число для теста"""
         super().hit(deck)
         # self.hand.append("5spade")  # тестирование требуемой карты, закомментить строку выше!
         # self.calc_score(self.hand)  # тестирование требуемой карты
+        return deck

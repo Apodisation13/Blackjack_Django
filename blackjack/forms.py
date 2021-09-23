@@ -5,7 +5,7 @@ from django.http import Http404
 
 class MoneyForm(forms.Form):
     """форма для ввода денег"""
-    money = forms.IntegerField(min_value=1)  # TODO: кастомное сообщение об ошибки, не работает
+    money = forms.IntegerField(min_value=1)  # TODO: кастомное сообщение об ошибке, не работает
 
     class Meta:
         fields = ['money', ]
@@ -25,7 +25,6 @@ def get_money(request):
         form = MoneyForm(request.POST)
         if form.is_valid():
             # MONEY = form.cleaned_data.get('money')  # здесь идёт запись в переменную MONEY
-            # print('денег', MONEY)
             request.session['money'] = form.cleaned_data.get('money')
             # MONEY = request.session['money']
             # return MONEY
@@ -41,8 +40,6 @@ class BetForm(forms.Form):
     def clean_bet(self, money):
         """проверка что ставка больше 0 и не больше чем всего денег"""
         bet = int(self.data.get('bet'))
-        # print(money)
-        # print(bet)
         if bet > money or bet <= 0:
             # raise ValidationError('Ставка не должна быть больше чем у вас денег')  # TODO: убрать ошибку??
             raise Http404()
@@ -55,8 +52,6 @@ def get_bet(request):
         form = BetForm(request.POST)
         if form.clean_bet(request.session['money']):
             # BET = int(form.data.get('bet'))
-            # print('ставка', BET)
-            # print('денег', money)
             request.session['bet'] = int(form.data.get('bet'))
             # BET = request.session['bet']
             # return BET
