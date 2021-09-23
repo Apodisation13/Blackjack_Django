@@ -13,4 +13,10 @@ urlpatterns = [
     path('game/stand/', stand, name='stand'),
     path('game/end_of_round/zero_money/', zero_money, name='zero_money'),
     path('game/double_down/', double_down, name='double_down'),
+    path('login/', login_user, name='login'),
+    path('register/', register_user, name='register'),
+    path('logout/', logout_user, name='logout'),
+    path('about/', about, name='about'),
+    path('rules/', rules_view, name='rules'),
+    path('settings/', settings, name='settings'),
 ]

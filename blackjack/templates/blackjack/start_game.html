@@ -22,13 +22,13 @@
 <h2>ВАШ СЧЁТ - {{ player_result }}</h2>
 
 <button class="hit_button" name="button" type="submit"
-        onclick="location.href='{% url "hit" %}'">HIT</button>
+        onclick="location.href='{% url "hit" %}'">ВЗЯТЬ<br>КАРТУ</button>
 <button class="stand_button" name="button" type="submit"
-        onclick="location.href='{% url "stand" %}'">STAND</button>
+        onclick="location.href='{% url "stand" %}'">ПАС<br>ХОД ДИЛЕРА</button>
 
 {% if double_down_chance %}
 <button class="double_down_button" name="button" type="submit"
-        onclick="location.href='{% url "double_down" %}'">DOUBLE DOWN</button>
+        onclick="location.href='{% url "double_down" %}'">УДВОИТЬ<br>СТАВКУ</button>
 {% endif %}
 
 {% endblock %}

@@ -1,6 +1,6 @@
 from time import sleep
 
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpResponse
 from django.shortcuts import render, redirect
 
 from .forms import MoneyForm, get_money, BetForm
@@ -122,3 +122,27 @@ def zero_money(request):
 def page_not_found(request, exception):
     msg = '<h1><font color="red">СТАВКА БОЛЬШЕ ЧЕМ У ВАС ДЕНЕГ</font></h1>'
     return HttpResponseNotFound(msg)
+
+
+def login_user(request):
+    return HttpResponse('вход')
+
+
+def logout_user(request):
+    return HttpResponse('выход')
+
+
+def register_user(request):
+    return HttpResponse('регистрация')
+
+
+def about(request):
+    return HttpResponse('о сайте')
+
+
+def rules_view(request):
+    return HttpResponse('правила')
+
+
+def settings(request):
+    return HttpResponse('настройки')
