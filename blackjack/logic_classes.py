@@ -12,6 +12,7 @@ class Participant:
         self.urls = []  # урлы для картинок
 
     def start_draw(self, deck):
+        """тянем две случайные карты, удаляем их из деки, считаем очки в руке"""
         for _ in range(2):  # тянем две случайные карты
             draw = choice(deck)
             deck.remove(draw)  # обязательно удалить карту из колоды, ведь мы её уже вытянули
@@ -65,12 +66,14 @@ class Participant:
 
 class Player(Participant):
     def start_draw(self, deck):
+        """у игрока вызываем свой метод на получение урлов"""
         super().start_draw(deck)
-        # self.hand = ["kclub", "aceclub"]  # тестирование на фиксированную руку
+        # self.hand = ["kclub", "5club"]  # тестирование на фиксированную руку
         # self.calc_score(self.hand)  # тестирование на фиксированную руку
         self.get_urls(self.hand)
 
     def hit(self, deck):
+        """это здесь чисто для теста"""
         super().hit(deck)
         # self.hand.append("6spade")  # тестирование требуемой карты, закомментить строку выше!
         # self.calc_score(self.hand)  # тестирование требуемой карты
@@ -79,8 +82,9 @@ class Player(Participant):
 
 class Dealer(Participant):
     def start_draw(self, deck):
+        """у дилера вызываем свой метод получения стартовых урлов, одна карта+обложка"""
         super().start_draw(deck)
-        # self.hand = ["acediamond", "10hearts"]  # тестирование на фиксированную руку
+        # self.hand = ["acediamond", "3hearts"]  # тестирование на фиксированную руку
         # self.calc_score(self.hand)  # тестирование на фиксированную руку
         self.get_starting_urls()
 
@@ -97,7 +101,7 @@ class Dealer(Participant):
         """
         логика дилера:
         1) если у игрока меньше 11, а счёт игрока и дилера равный, то дилер возьмёт одну карту, т.к. не переберёт
-        пример: 4,6==10, 3,7==10, дилеру смело можно брать 1 карту
+        пример: 4,6==10, 3,7==10, дилеру смело можно брать 1 карту (небольшой костыль)
         2) далее пока максимальный счёт дилера (с учётом туза) не больше максимального счёта игрока, брать дилеру карты
         ЭТОТ МЕТОД НЕ БУДЕТ ВЫЗЫВАТЬСЯ ЕСЛИ У ИГРОКА ПЕРЕБОР!
         """
@@ -108,8 +112,8 @@ class Dealer(Participant):
         return deck
 
     def hit(self, deck):
-        """это здесь число для теста"""
+        """это здесь чисто для теста"""
         super().hit(deck)
-        # self.hand.append("5spade")  # тестирование требуемой карты, закомментить строку выше!
+        # self.hand.append("7spade")  # тестирование требуемой карты, закомментить строку выше!
         # self.calc_score(self.hand)  # тестирование требуемой карты
         return deck

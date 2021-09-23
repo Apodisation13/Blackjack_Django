@@ -4,8 +4,8 @@ from django.http import HttpResponseNotFound
 from django.shortcuts import render, redirect
 
 from .forms import MoneyForm, get_money, BetForm
-from .logic import starting_draw_logic, hit_logic, end_of_round_logic, stand_logic
-from .logic import redirect_from_start_via_blackjack
+from .logic_game_views import starting_draw_logic, hit_logic, end_of_round_logic, stand_logic
+from .logic_game_views import redirect_from_start_via_blackjack
 from .logic_classes import Player, Dealer
 from .utils import get_context
 
@@ -46,7 +46,9 @@ def base_view(request):
     if redirect_from_start_via_blackjack(request, player, dealer):  # проверка на 21
         return redirect('end_of_round')
 
-    context = get_context(request, player, dealer, request.session['player_score_str'])
+    context = get_context(request, player, dealer,
+                          player_result=request.session['player_score_str'],
+                          double=request.session['double_down_chance'])
 
     return render(request, template_name, context)
 
@@ -65,7 +67,7 @@ def hit(request):
     elif max(player.score) == 21:  # если у игрока ровно 21, идти на логику stand, где ходы дилера
         return redirect('stand')
 
-    context = get_context(request, player, dealer, request.session['player_score_str'])
+    context = get_context(request, player, dealer, player_result=request.session['player_score_str'])
 
     return render(request, template_name, context)
 
@@ -81,7 +83,8 @@ def end_of_round(request):
 
     context = get_context(
         request, player, dealer, max(player.score),
-        request.session['dealer_result'], request.session['money_before']
+        dealer_result=request.session['dealer_result'],
+        money_before=request.session['money_before']
     )
 
     return render(request, template_name, context)
@@ -95,11 +98,11 @@ def stand(request):
     player = Player.from_json(request.session['player'])
     dealer = Dealer.from_json(request.session['dealer'])
 
-    # TODO: почему не >=
+    # если дилер вылетел, или игрок вылетел, или у них ничья, то пойти на конец раунда
     if max(dealer.score) > 21 or max(player.score) >= 21 or max(dealer.score) >= max(player.score):
-        return redirect('end_of_round')  # если дилер вылетел, или у них ничья, то пойти на конец раунда
+        return redirect('end_of_round')
 
-    context = get_context(request, player, dealer, request.session['player_score_str'])
+    context = get_context(request, player, dealer, player_result=request.session['player_score_str'])
 
     return render(request, template_name, context)
 

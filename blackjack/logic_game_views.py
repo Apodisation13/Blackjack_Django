@@ -57,13 +57,15 @@ def hit_logic(request):
     """взять карту, получить на неё линк, представление очков в виде 11/21"""
     player = Player.from_json(request.session['player'])
 
-    d = player.hit(request.session['deck'])
+    d = player.hit(request.session['deck'])  # игрок берет карту, там надо return deck
     request.session['deck'] = d  # взять одну карту и пересчитать очки
+
     player.get_urls([player.hand[-1], ])  # сформировать линк на последнюю карту
+
     player_score_str = player.set_score_to_str()  # представление - или просто число, или строка 11/21
     request.session['player_score_str'] = player_score_str
 
-    request.session['player'] = player.to_json()
+    request.session['player'] = player.to_json()  # "обновить" объект игрока
 
 
 def end_of_round_logic(request):
@@ -74,7 +76,7 @@ def end_of_round_logic(request):
     if request.session['double_down_pressed']:
         # если кнопка удвоения нажата, берём ровно 1 карту, и если не перебрали 21, дилер ходит как обычно
         hit_logic(request)
-        player = Player.from_json(request.session['player'])
+        player = Player.from_json(request.session['player'])  # обновить объект игрока
         if max(player.score) <= 21:
             stand_logic(request)
             dealer = Dealer.from_json(request.session['dealer'])

@@ -1,4 +1,4 @@
-def get_context(request, player, dealer, player_result, dealer_result='???', money_before=None):
+def get_context(request, player, dealer, player_result, dealer_result='???', money_before=None, double=False):
     """формирование контекста для вью base_view, stand, hit, end_of_round"""
     context = {
         'dealer_hand_urls': dealer.urls,  # линки на карты дилера
@@ -8,7 +8,7 @@ def get_context(request, player, dealer, player_result, dealer_result='???', mon
         'money_before': money_before,  # для удобства отображения для end_of_round
         'money': request.session['money'],
         'bet': request.session['bet'],
-        'double_down_chance': request.session['double_down_chance'],  # boolean данные о возможности удвоить ставку
+        'double_down_chance': double,  # boolean данные о возможности удвоить ставку
         'player_hand': len(player.hand),  # для анализа на 21, в каком порядке счёт анализировать в шаблоне
         'dealer_hand': len(dealer.hand),
     }
