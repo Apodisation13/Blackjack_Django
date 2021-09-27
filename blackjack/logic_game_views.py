@@ -27,6 +27,7 @@ def starting_draw_logic(request):
     # стартовая рука дилера (2 карты), линк на 1ю карту и обложку, счёт не отображаем но считаем
     dealer = Dealer()
     dealer.start_draw(request.session['deck'])
+    dealer.get_starting_urls(request.session['card_back'] if request.session.get('card_back') else 'cardback1')
 
     request.session['player'] = player.to_json()  # сериализация объекта в джейсон
     request.session['dealer'] = dealer.to_json()  # сериализация объекта в джейсон

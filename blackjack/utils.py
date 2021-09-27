@@ -1,3 +1,6 @@
+from .deck import cardbacks
+
+
 def get_context(request, player, dealer, player_result, dealer_result='???', money_before=None, double=False):
     """формирование контекста для вью base_view, stand, hit, end_of_round"""
     context = {
@@ -13,3 +16,19 @@ def get_context(request, player, dealer, player_result, dealer_result='???', mon
         'dealer_hand': len(dealer.hand),
     }
     return context
+
+
+def set_card_back(request):
+    """выбор обложки карт"""
+    context = {
+        'card_back_links': list(cardbacks.values()),
+        'card_backs': list(cardbacks.keys())
+    }
+    if request.method == 'POST':
+        form = request.POST
+        for card_back in cardbacks:
+            selected_card_back = form.get(card_back)
+            if selected_card_back:
+                request.session['card_back'] = selected_card_back
+                return selected_card_back, cardbacks, context
+    return None, cardbacks, context

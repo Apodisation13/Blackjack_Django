@@ -65,3 +65,11 @@ links = {
     "play_button": "https://i.ibb.co/jwtLDQ8/play-button.png",
     "table": "https://i.ibb.co/sJ963Dc/Table.png"
 }
+
+
+cardbacks = {
+    "cardback1": "https://i.ibb.co/ZdmDvxQ/cardback.jpg",
+    "cardback2": "https://i.ibb.co/DGPb1Qq/cardback2.jpg",
+    "cardback3": "https://i.ibb.co/GtWYHrL/cardbackred.png",
+    "cardback4": "https://i.ibb.co/dDY5gm0/antonis-papantoniou-grimoire-cardback.jpg"
+}

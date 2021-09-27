@@ -1,7 +1,7 @@
 import json
 from random import choice
 
-from .deck import links
+from .deck import links, cardbacks
 from .calculate_hand import calc_cards
 
 
@@ -86,12 +86,12 @@ class Dealer(Participant):
         super().start_draw(deck)
         # self.hand = ["acediamond", "3hearts"]  # тестирование на фиксированную руку
         # self.calc_score(self.hand)  # тестирование на фиксированную руку
-        self.get_starting_urls()
+        # self.get_starting_urls()  # вызов теперь вручную, из-за обложки
 
-    def get_starting_urls(self):
-        """первую карту из руки - берем линк, а вторую - жёстко карту обложки"""
+    def get_starting_urls(self, card_back):
+        """первую карту из руки - берем линк, а вторую - карту обложки"""
         self.urls.append(links.get(self.hand[0]))  # первая карта из руки
-        self.urls.append(links['cardback1'])  # вторая карта - жёстко обложка
+        self.urls.append(cardbacks[card_back])  # вторая карта - жёстко обложка
 
     def get_url_for_hidden_card(self):
         """для случая stand - получить линк на ту карту, где раньше была обложка"""

@@ -7,7 +7,7 @@ from .forms import MoneyForm, get_money, BetForm
 from .logic_game_views import starting_draw_logic, hit_logic, end_of_round_logic, stand_logic
 from .logic_game_views import redirect_from_start_via_blackjack
 from .logic_classes import Player, Dealer
-from .utils import get_context
+from .utils import get_context, set_card_back
 
 
 def home(request):
@@ -137,12 +137,18 @@ def register_user(request):
 
 
 def about(request):
-    return HttpResponse('о сайте')
+    template_name = 'blackjack/about.html'
+    return render(request, template_name, {})
 
 
 def rules_view(request):
-    return HttpResponse('правила')
+    template_name = 'blackjack/rules.html'
+    return render(request, template_name, {})
 
 
 def settings(request):
-    return HttpResponse('настройки')
+    """/settings - выбор обложки карты"""
+    template_name = 'blackjack/settings.html'
+    card_back, card_backs, context = set_card_back(request)
+    print(card_back)
+    return render(request, template_name, context)

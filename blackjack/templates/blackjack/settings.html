@@ -1,0 +1,23 @@
+{% extends "blackjack/base.html" %}
+
+{% block title %}
+    <title>Правила игры</title>
+{% endblock %}
+
+{% block body %}
+
+<form action="{% url 'settings' %}" method="post"> {% csrf_token %}
+<br>
+<h2>Выберите обложку, щёлкните по ней мышкой, при следующей раздаче она применится</h2>
+    {% for card_back in card_back_links %}
+        <img src={{ card_back }} width="150" height="170">
+    {% endfor %}
+<br>
+    {% for card_back in card_backs %}
+        <button class="stand_button" name="{{ card_back }}" type="submit" value="{{ card_back }}"
+            onclick="location.href='{% url "settings" %}'">ВЫБРАТЬ</button>
+    {% endfor %}
+
+</form>
+
+{% endblock %}
